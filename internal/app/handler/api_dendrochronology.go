@@ -48,7 +48,7 @@ func (h *Handler) APIGetCart(ctx *gin.Context) {
 
 // APIGetDendrochronologies Список заявок
 // @Summary Список заявок на дендроанализ
-// @Description Без черновика и удалённых; фильтры по дате формирования и статусу. Пользователь видит свои; модератор — все.
+// @Description Все заявки; фильтры по дате формирования и статусу. Пользователь видит свои; модератор — все.
 // @Tags dendrochronologies
 // @Produce json
 // @Param from_date query string false "Начало диапазона даты формирования, YYYY-MM-DD"

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"math/rand"
@@ -58,6 +59,9 @@ func main() {
 			Status:     status,
 			CreatorID:  creator.ID,
 			DateCreate: dateCreate,
+		}
+		if status != ds.StatusDraft && status != ds.StatusDeleted {
+			app.DateFormed = sql.NullTime{Time: dateCreate, Valid: true}
 		}
 
 		faker.FakeData(&app.BuildDate)

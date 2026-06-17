@@ -223,13 +223,13 @@ func (r *Repository) GetDendrochronologyByID(id int) (ds.Dendrochronology, error
 	return d, nil
 }
 
-// GetAllDendrochronologies возвращает заявки кроме удалённых и черновика, с фильтром по диапазону даты формирования и статусу.
+// GetAllDendrochronologies возвращает все заявки с фильтром по диапазону даты формирования и статусу.
 // Если isModerator == false, возвращаются только заявки с creator_id = viewerID.
 func (r *Repository) GetAllDendrochronologies(from, to time.Time, status string, viewerID uint, isModerator bool, limit, offset int) ([]ds.Dendrochronology, int64, error) {
 	var list []ds.Dendrochronology
 	var total int64
 
-	sub := r.db.Model(&ds.Dendrochronology{}).Where("status != ? AND status != ?", ds.StatusDeleted, ds.StatusDraft)
+	sub := r.db.Model(&ds.Dendrochronology{})
 	if !isModerator {
 		sub = sub.Where("creator_id = ?", viewerID)
 	}
