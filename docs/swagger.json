@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "REST API: каталог конструкций, заявки на дендрохронологический анализ. Без авторизации доступны только GET каталога; с JWT — методы пользователя; модератор — создание конструкций и завершение заявок.",
+        "description": "REST API",
         "title": "Dendrochronology API",
         "contact": {},
         "version": "1.0"
@@ -291,16 +291,26 @@
                         "description": "Фильтр по статусу заявки",
                         "name": "status",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Номер страницы",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Количество элементов на странице",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/serializer.DendrochronologyListJSON"
-                            }
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -799,7 +809,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Образцы, даты резки и коррекции для пары конструкция–заявка.",
+                "description": "Образцы, даты резки и коррекции для пары конструкция–заявка",
                 "consumes": [
                     "application/json"
                 ],
@@ -1153,6 +1163,9 @@
                 "is_delete": {
                     "type": "boolean"
                 },
+                "short_description_en": {
+                    "type": "string"
+                },
                 "use_life": {
                     "type": "string"
                 },
@@ -1172,6 +1185,9 @@
                 },
                 "samples_count": {
                     "type": "integer"
+                },
+                "use_life": {
+                    "type": "string"
                 }
             }
         },
@@ -1313,7 +1329,6 @@
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Передавайте JWT: \"Bearer \\\u003ctoken\\\u003e\" (тот же токен, что в cookie auth_token после входа).",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

@@ -225,9 +225,11 @@ func (r *Repository) GetDendrochronologyByID(id int) (ds.Dendrochronology, error
 
 // GetAllDendrochronologies возвращает заявки кроме удалённых и черновика, с фильтром по диапазону даты формирования и статусу.
 // Если isModerator == false, возвращаются только заявки с creator_id = viewerID.
-func (r *Repository) GetAllDendrochronologies(from, to time.Time, status string, viewerID uint, isModerator bool) ([]ds.Dendrochronology, error) {
+func (r *Repository) GetAllDendrochronologies(from, to time.Time, status string, viewerID uint, isModerator bool, limit, offset int) ([]ds.Dendrochronology, int64, error) {
 	var list []ds.Dendrochronology
-	sub := r.db.Where("status != ? AND status != ?", ds.StatusDeleted, ds.StatusDraft)
+	var total int64
+
+	sub := r.db.Model(&ds.Dendrochronology{}).Where("status != ? AND status != ?", ds.StatusDeleted, ds.StatusDraft)
 	if !isModerator {
 		sub = sub.Where("creator_id = ?", viewerID)
 	}
@@ -237,14 +239,17 @@ func (r *Repository) GetAllDendrochronologies(from, to time.Time, status string,
 	if !to.IsZero() {
 		sub = sub.Where("date_formed <= ?", to.Add(24*time.Hour))
 	}
-	if status != "" {
+	if status != "" && status != "Все" {
 		sub = sub.Where("status = ?", status)
 	}
-	err := sub.Order("id").Find(&list).Error
+	
+	sub.Count(&total)
+
+	err := sub.Order("id").Limit(limit).Offset(offset).Find(&list).Error
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return list, nil
+	return list, total, nil
 }
 
 // GetDendrochronologyConstructionsAPI returns the m-m records for a dendrochronology with construction data.

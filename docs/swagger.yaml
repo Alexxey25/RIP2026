@@ -12,6 +12,8 @@ definitions:
         type: string
       is_delete:
         type: boolean
+      short_description_en:
+        type: string
       use_life:
         type: string
       video_url:
@@ -25,6 +27,8 @@ definitions:
         type: string
       samples_count:
         type: integer
+      use_life:
+        type: string
     type: object
   serializer.DendroConstructionViewJSON:
     properties:
@@ -117,9 +121,7 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: 'REST API: каталог конструкций, заявки на дендрохронологический анализ.
-    Без авторизации доступны только GET каталога; с JWT — методы пользователя; модератор
-    — создание конструкций и завершение заявок.'
+  description: REST API
   title: Dendrochronology API
   version: "1.0"
 paths:
@@ -303,15 +305,22 @@ paths:
         in: query
         name: status
         type: string
+      - description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - description: Количество элементов на странице
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/serializer.DendrochronologyListJSON'
-            type: array
+            additionalProperties: true
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -690,7 +699,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Образцы, даты резки и коррекции для пары конструкция–заявка.
+      description: Образцы, даты резки и коррекции для пары конструкция–заявка
       parameters:
       - description: ID конструкции
         in: path
@@ -856,8 +865,6 @@ paths:
       - users
 securityDefinitions:
   ApiKeyAuth:
-    description: 'Передавайте JWT: "Bearer \<token\>" (тот же токен, что в cookie
-      auth_token после входа).'
     in: header
     name: Authorization
     type: apiKey

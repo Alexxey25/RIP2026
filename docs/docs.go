@@ -297,16 +297,26 @@ const docTemplate = `{
                         "description": "Фильтр по статусу заявки",
                         "name": "status",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Номер страницы",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Количество элементов на странице",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/serializer.DendrochronologyListJSON"
-                            }
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -805,7 +815,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Образцы, даты резки и коррекции для пары конструкция–заявка.",
+                "description": "Образцы, даты резки и коррекции для пары конструкция–заявка",
                 "consumes": [
                     "application/json"
                 ],
@@ -1159,6 +1169,9 @@ const docTemplate = `{
                 "is_delete": {
                     "type": "boolean"
                 },
+                "short_description_en": {
+                    "type": "string"
+                },
                 "use_life": {
                     "type": "string"
                 },
@@ -1178,6 +1191,9 @@ const docTemplate = `{
                 },
                 "samples_count": {
                     "type": "integer"
+                },
+                "use_life": {
+                    "type": "string"
                 }
             }
         },
@@ -1319,7 +1335,6 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Передавайте JWT: \"Bearer \\\u003ctoken\\\u003e\" (тот же токен, что в cookie auth_token после входа).",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -1334,7 +1349,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "Dendrochronology API",
-	Description:      "REST API: каталог конструкций, заявки на дендрохронологический анализ. Без авторизации доступны только GET каталога; с JWT — методы пользователя; модератор — создание конструкций и завершение заявок.",
+	Description:      "REST API",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

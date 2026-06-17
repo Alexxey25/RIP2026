@@ -54,8 +54,10 @@ func (h *Handler) APIGetCart(ctx *gin.Context) {
 // @Param from_date query string false "Начало диапазона даты формирования, YYYY-MM-DD"
 // @Param to_date query string false "Конец диапазона, YYYY-MM-DD"
 // @Param status query string false "Фильтр по статусу заявки"
+// @Param page query int false "Номер страницы"
+// @Param limit query int false "Количество элементов на странице"
 // @Security ApiKeyAuth
-// @Success 200 {array} serializer.DendrochronologyListJSON
+// @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
@@ -79,13 +81,17 @@ func (h *Handler) APIGetDendrochronologies(ctx *gin.Context) {
 		to = t
 	}
 	status := ctx.Query("status")
+	
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	offset := (page - 1) * limit
 
 	uid, err := authUserIDUint(ctx)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusUnauthorized, err)
 		return
 	}
-	list, err := h.Repository.GetAllDendrochronologies(from, to, status, uid, isModeratorFromCtx(ctx))
+	list, total, err := h.Repository.GetAllDendrochronologies(from, to, status, uid, isModeratorFromCtx(ctx), limit, offset)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusInternalServerError, err)
 		return
@@ -98,7 +104,12 @@ func (h *Handler) APIGetDendrochronologies(ctx *gin.Context) {
 		datedCount := h.Repository.GetDatedConstructionsCount(d.ID)
 		resp = append(resp, serializer.DendrochronologyToListJSON(d, creatorLogin, moderatorLogin, datedCount))
 	}
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, gin.H{
+		"total": total,
+		"page":  page,
+		"limit": limit,
+		"data":  resp,
+	})
 }
 
 // APIGetDendrochronology Детальная заявка
